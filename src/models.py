@@ -27,32 +27,45 @@ class MultiLayerPerceptron:
 
     def fit(self, X, y):
         np.random.seed(self.seed)
-        target_y = 2 * y - 1 if self.activation == 'Tanh' else y.copy()
+        target_y = y.copy()
         layer_sizes = [X.shape[1]] + self.hidden_layers + [y.shape[1]]
         self.weights, self.biases = [], []
         for n_in, n_out in zip(layer_sizes[:-1], layer_sizes[1:]):
             self.weights.append(np.random.uniform(-0.5, 0.5, (n_out, n_in)))
             self.biases.append(np.random.uniform(-0.5, 0.5, n_out) if self.use_bias else np.zeros(n_out))
         self.accuracy_history = []
+
         for epoch in range(self.epochs):
-            correct = 0
             indices = np.random.permutation(len(X))
+
             for i in indices:
                 inputs = [X[i]]
                 for W, b in zip(self.weights, self.biases):
-                    inputs.append(self.activationFunction(np.dot(W, inputs[-1]) + b))
-                if list(inputs[-1]).index(max(inputs[-1])) == list(y[i]).index(max(y[i])):
-                    correct += 1
-                delta = (target_y[i] - inputs[-1]) * self.activationFunctionDerivative(inputs[-1])
+                    inputs.append(
+                        self.activationFunction(np.dot(W, inputs[-1]) + b)
+                    )
+
+                delta = (
+                    target_y[i] - inputs[-1]
+                ) * self.activationFunctionDerivative(inputs[-1])
                 for l in range(len(self.weights) - 1, -1, -1):
                     if l > 0:
-                       prev_delta = np.dot(self.weights[l].T, delta) * self.activationFunctionDerivative(inputs[l])
-                    self.weights[l] += self.learning_rate * np.outer(delta, inputs[l])
+                        prev_delta = (
+                            np.dot(self.weights[l].T, delta)
+                            * self.activationFunctionDerivative(inputs[l])
+                        )
+
+                    self.weights[l] += self.learning_rate * np.outer(
+                        delta, inputs[l]
+                    )
+
                     if self.use_bias:
                         self.biases[l] += self.learning_rate * delta
+
                     if l > 0:
                         delta = prev_delta
-            self.accuracy_history.append(correct / len(X))
+
+            self.accuracy_history.append(self.score(X, y))
         return self
 
     def predict(self, X):

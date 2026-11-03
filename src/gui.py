@@ -292,6 +292,7 @@ class PenguinGUI(tk.Tk):
         self.log_box.delete('1.0', 'end')
         self.log_box.configure(state='disabled')
 
+
     def _read_params(self):
         try:
             eta = float(self.ent_eta.get())
@@ -302,21 +303,40 @@ class PenguinGUI(tk.Tk):
             if not nodes_str:
                 raise ValueError("Nodes cannot be empty")
 
+            # Convert the input string into a list of integers
             nodes_list = [int(x.strip()) for x in nodes_str.split(',')]
 
+            # Check that the number of layers and neurons is positive
+            if num_layers <= 0 or any(n <= 0 for n in nodes_list):
+                raise ValueError("Layer counts and neuron counts must be positive.")
+
+            # Check that the number of neuron counts matches the number of layers
             if len(nodes_list) != num_layers:
-                messagebox.showerror('Input error', f"You specified {num_layers} layers but provided {len(nodes_list)} node counts.")
+                messagebox.showerror(
+                    'Input error',
+                    f"You specified {num_layers} layers but provided {len(nodes_list)} node counts."
+                )
                 return None
 
+            # Check learning rate and epochs
             if eta <= 0 or epochs <= 0:
                 raise ValueError("Values must be > 0")
 
         except ValueError:
-            messagebox.showerror('Input error', 'Please ensure all inputs are valid positive numbers.')
+            messagebox.showerror(
+                'Input error',
+                'Please ensure all inputs are valid positive numbers.'
+            )
             return None
 
-        return dict(eta=eta, epochs=epochs, num_layers=num_layers, hidden_layers=nodes_list,
-                    use_bias=self.var_bias.get(), activation=self.var_act.get())
+        return dict(
+            eta=eta,
+            epochs=epochs,
+            num_layers=num_layers,
+            hidden_layers=nodes_list,
+            use_bias=self.var_bias.get(),
+            activation=self.var_act.get()
+        )
 
     def on_train(self):
         p = self._read_params()
