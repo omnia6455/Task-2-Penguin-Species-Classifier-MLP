@@ -74,11 +74,6 @@ class MultiLayerPerceptron:
             class_preds.append(one_hot)
         return np.array(class_preds)
 
-    def score(self, X, y):
-        preds = self.predict_classes(X).argmax(axis=1)
-        true = y.argmax(axis=1)
-        return float(np.mean(preds == true))
-
 def evaluate_predictions(y_true, y_pred_classes):
     cm = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     correct = 0

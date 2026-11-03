@@ -36,8 +36,26 @@ def plot_confusion_matrix(cm, class_names, ax=None):
     else:
         fig = ax.figure
     cm = np.array(cm)
-    cmap = mcolors.LinearSegmentedColormap.from_list("custom_cyan", ["#ffffff", "#52c6e3"])
+    cmap = plt.cm.Blues
     im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    fig.colorbar(im, ax=ax)
     ax.set_xticks(np.arange(len(class_names)))
     ax.set_yticks(np.arange(len(class_names)))
-    ax.set_xticklabels(class_names, fontsize=10, color='#2f4a5f')
+    ax.set_xticklabels(class_names, fontsize=10)
+    ax.set_yticklabels(class_names, fontsize=10)
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position('top')
+    ax.set_xlabel('Prediction', fontsize=12, labelpad=10)
+    ax.set_ylabel('Actual', fontsize=12, labelpad=10)
+    ax.set_title('Confusion Matrix', fontsize=16, pad=30)
+    thresh = cm.max() / 2.
+    for i in range(len(class_names)):
+        for j in range(len(class_names)):
+            text_color = "white" if cm[i, j] > thresh else "#08306b"
+            ax.text(j, i, str(cm[i, j]),ha="center", va="center", color=text_color, fontsize=11)
+    for name, spine in ax.spines.items():
+        spine.set_color('black')
+        spine.set_linewidth(1.0)
+    ax.tick_params(colors='black', labelsize=10)
+    ax.grid(False)
+    return fig, ax
